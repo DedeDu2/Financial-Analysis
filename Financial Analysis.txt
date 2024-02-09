@@ -1,0 +1,29 @@
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+
+# Generate sample data
+np.random.seed(0)
+num_assets = 4
+returns = np.random.rand(100, num_assets)
+
+# Define objective function
+def portfolio_variance(weights, returns):
+    cov_matrix = np.cov(returns.T)
+    portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
+    return portfolio_variance
+
+# Define constraints
+constraints = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1})
+
+# Define bounds
+bounds = tuple((0, 1) for asset in range(num_assets))
+
+# Initial guess
+initial_guess = [1/num_assets for asset in range(num_assets)]
+
+# Optimize portfolio
+result = minimize(portfolio_variance, initial_guess, args=returns, method='SLSQP', bounds=bounds, constraints=constraints)
+
+# Print optimized portfolio weights
+print("Optimized Portfolio Weights:", result.x)
